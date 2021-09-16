@@ -75,25 +75,23 @@ To run the test, just do:
 ```
 
 # Trouble shooting
-- missing go.sum entry for module providing package ...
+- missing go.sum entry for module providing package ...  
   run `go build -mod=mod` will generate go.sum
-- go-multiaddr-net@v0.2.0/registry.go:25:17: undefined: manet.NetCodec
+- go-multiaddr-net@v0.2.0/registry.go:25:17: undefined: manet.NetCodec  
   go-multiaddr v0.3.3 and not v0.4.0.
-- libp2p/go-libp2p-noise@v0.2.0/handshake.go:209:21: cannot assign error to err in multiple assignment
+- libp2p/go-libp2p-noise@v0.2.0/handshake.go:209:21: cannot assign error to err in multiple assignment  
   go-libp2p-core v0.8.6 and not v0.9.0
-- go-ipfs@v0.9.1/core/coreapi/path.go:52:18: undefined: resolver.ResolveOnce 
+- go-ipfs@v0.9.1/core/coreapi/path.go:52:18: undefined: resolver.ResolveOnce   
   replace go-ipfs v0.9.1 to latest v0.10.0-rc1
-- panic: failed to spawn ephemeral node: no IPFS repo found in /home/zhh/.ipfs.
+- panic: failed to spawn ephemeral node: no IPFS repo found in /home/zhh/.ipfs.  
   please install go-ipfs and run: 'ipfs init'. 
-
-- failed to spawn ephemeral node: failed to init ephemeral node: unknown datastore type: flatfs
+- failed to spawn ephemeral node: failed to init ephemeral node: unknown datastore type: flatfs  
   run `ipfs init` first
-- failed to spawn ephemeral node: no version file found, please run 0-to-1 migration tool.
-See https://github.com/ipfs/fs-repo-migrations/blob/master/run.md
-Sorry for the inconvenience. In the future, these will run automatically.
+- failed to spawn ephemeral node: no version file found, please run 0-to-1 migration tool.  
+See https://github.com/ipfs/fs-repo-migrations/blob/master/run.md  
+Sorry for the inconvenience. In the future, these will run automatically.  
   not init repo directory correctly. run `ipfs init` first.
-
-- failed to sufficiently increase receive buffer size
+- failed to sufficiently increase receive buffer size  
   run `sudo sysctl -w net.core.rmem_max=2500000`,
   This command would increase the maximum receive buffer size to roughly 2.5 MB
 
