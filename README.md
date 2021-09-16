@@ -1,8 +1,9 @@
-# Ipfs Manager 
-- Author: Andy Zhou
+# IPFS Manager 
+- Author: Andy Zhou <ablozhou@gmail.com>
 - Date: 2021-09-15
 
-This is a golang library to manager IPFS file and directory.
+## Abstract
+This is a golang module to manager IPFS file and directory.
 
 It's a part of IPFS grant service for enterprice.
 
@@ -10,7 +11,11 @@ The main functions of the library is:
 - Add files and directories to IPFS
 - Get files and directories from IPFS
 
-# env
+This module tested on Ubuntu Linux 2020
+
+If you have any problem please contact the author.
+
+## Env
 - [golang 1.16+](https://golang.org/doc/install)
 - [ipfs v0.9.1+](https://dist.ipfs.io/#go-ipfs)
 
@@ -27,10 +32,16 @@ then import the mod  as normal.
 import (
   m "github.com/filecoincrypto/ipfsmgr"
 )
-
-## build
 ```
+
+## Build from source
+First you must add golang and ipfs CLI.
+
+```
+git clone https://github.com/filecoincrypto/ipfsmgr.git
+
 go clean --modcache
+
 go mod tidy
 
 go build -mod=mod
@@ -38,7 +49,7 @@ go build -mod=mod
 go install
 ```
 
-## install ipfs on Linux
+## Install ipfs on Linux
 ```
 wget https://dist.ipfs.io/go-ipfs/v0.9.1/go-ipfs_v0.9.1_linux-amd64.tar.gz --no-check-certificate
 tar -xvzf go-ipfs_v0.9.1_linux-amd64.tar.gz
@@ -54,6 +65,7 @@ ipfs --version
 
 > ipfs version 0.9.1
 ```
+
 ## Running a test
 
 To run the test, just do:
@@ -61,7 +73,8 @@ To run the test, just do:
 ```
 > go test
 ```
-# trouble shooting
+
+# Trouble shooting
 - missing go.sum entry for module providing package ...
   run `go build -mod=mod` will generate go.sum
 - go-multiaddr-net@v0.2.0/registry.go:25:17: undefined: manet.NetCodec
@@ -83,6 +96,7 @@ Sorry for the inconvenience. In the future, these will run automatically.
 - failed to sufficiently increase receive buffer size
   run `sudo sysctl -w net.core.rmem_max=2500000`,
   This command would increase the maximum receive buffer size to roughly 2.5 MB
+
 # Reference
 - [install ipfs](https://docs.ipfs.io/install/)
 - [download ipfs binary](https://dist.ipfs.io/#go-ipfs)
