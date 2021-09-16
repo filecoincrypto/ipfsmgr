@@ -3,11 +3,10 @@ module github.com/filecoincrypto/ipfsmgr
 go 1.16
 
 require (
-	github.com/cheggaaa/pb v1.0.29
 	github.com/ipfs/go-ipfs v0.10.0-rc1
 	github.com/ipfs/go-ipfs-config v0.16.0
 	github.com/ipfs/go-ipfs-files v0.0.8
-	github.com/ipfs/go-merkledag v0.4.0 //go-ipfs@v0.9.1/core/coreapi/path.go:64:3: unknown field 'DAG' in struct literal of type resolver.Resolver
+	//github.com/ipfs/go-merkledag v0.4.0 //go-ipfs@v0.9.1/core/coreapi/path.go:64:3: unknown field 'DAG' in struct literal of type resolver.Resolver
 	//github.com/ipfs/interface-go-ipfs-core v0.5.1
 	github.com/ipfs/interface-go-ipfs-core v0.5.1
 	// github.com/libp2p/go-libp2p-core v0.9.0 to avoid undefined: manet.NetCodec error.

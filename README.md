@@ -56,15 +56,18 @@ To run the test, just do:
 - go-ipfs@v0.9.1/core/coreapi/path.go:52:18: undefined: resolver.ResolveOnce 
   replace go-ipfs v0.9.1 to latest v0.10.0-rc1
 - panic: failed to spawn ephemeral node: no IPFS repo found in /home/zhh/.ipfs.
-please install go-ipfs and run: 'ipfs init'. 
+  please install go-ipfs and run: 'ipfs init'. 
 
 - failed to spawn ephemeral node: failed to init ephemeral node: unknown datastore type: flatfs
- run `ipfs init` first
+  run `ipfs init` first
 - failed to spawn ephemeral node: no version file found, please run 0-to-1 migration tool.
 See https://github.com/ipfs/fs-repo-migrations/blob/master/run.md
 Sorry for the inconvenience. In the future, these will run automatically.
-not init repo directory correctly. run `ipfs init` first.
+  not init repo directory correctly. run `ipfs init` first.
 
+- failed to sufficiently increase receive buffer size
+  run `sudo sysctl -w net.core.rmem_max=2500000`,
+  This command would increase the maximum receive buffer size to roughly 2.5 MB
 # Reference
 - [install ipfs](https://docs.ipfs.io/install/)
 - [download ipfs binary](https://dist.ipfs.io/#go-ipfs)

@@ -66,7 +66,7 @@ func (mgr *IpfsMgr) AddIpfsFile(inputPathFile string) (cidFile icorepath.Path, e
 	return cidFile, err
 }
 
-// AddIpfsDir
+// AddIpfsDir add local directory to IPFS
 func (mgr *IpfsMgr) AddIpfsDir(inputPath string) (cidPath icorepath.Path, err error) {
 	directory, err := mgr.GetLocalNode(inputPath)
 	if err != nil {
@@ -134,7 +134,7 @@ func (mgr *IpfsMgr) GetIpfsDirFromCid(cidDirectory icorepath.Path, outputPath st
 	return nil
 }
 
-//CreateRepo
+//CreateRepo create and config a repo
 func (mgr *IpfsMgr) CreateRepo(repoPath string) error {
 
 	// Create a config with default options and a 2048 bit key
@@ -214,6 +214,7 @@ func (mgr *IpfsMgr) CreateNode(repoPath string) (api icore.CoreAPI, err error) {
 	return coreapi.NewCoreAPI(node)
 }
 
+// SetupPlugins setup repo external plugins directors and load the plugins
 func (mgr *IpfsMgr) SetupPlugins(pluginsPath string) error {
 	// Load any external plugins if available on pluginsPath
 	plugins, err := loader.NewPluginLoader(filepath.Join(pluginsPath, "plugins"))
@@ -234,7 +235,7 @@ func (mgr *IpfsMgr) SetupPlugins(pluginsPath string) error {
 }
 
 // ConnectToPeers connect peers, there are default bootstrap peers.
-// param peers could be nil or empty.
+// param peers could be nil or empty, or you can add your own peers.
 func (mgr *IpfsMgr) ConnectToPeers(peers []string) error {
 	var wg sync.WaitGroup
 
@@ -277,6 +278,8 @@ func (mgr *IpfsMgr) ConnectToPeers(peers []string) error {
 	return nil
 }
 
+// GetLocalFile read local file content
+// ipfs File include Node interface and io.Reader io.Seeker
 func (mgr *IpfsMgr) GetLocalFile(path string) (files.File, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -297,7 +300,8 @@ func (mgr *IpfsMgr) GetLocalFile(path string) (files.File, error) {
 	return f, nil
 }
 
-//GetLocalNode
+// GetLocalNode get local file node
+// ipfs Node is a common interface for files, directories and other special files
 func (mgr *IpfsMgr) GetLocalNode(path string) (files.Node, error) {
 	st, err := os.Stat(path)
 	if err != nil {
@@ -312,7 +316,7 @@ func (mgr *IpfsMgr) GetLocalNode(path string) (files.Node, error) {
 	return f, nil
 }
 
-/// -------
+// bootstrapNodes defaut ipfs nodes to connect
 var bootstrapNodes = []string{
 	// IPFS Bootstrapper nodes.
 	"/dnsaddr/bootstrap.libp2p.io/p2p/QmNnooDu7bfjPFoTZYxMNLWUQJyrVwtbZg5gBMjTezGAJN",
@@ -330,11 +334,10 @@ var bootstrapNodes = []string{
 	"/ip4/94.130.135.167/tcp/4001/p2p/QmUEMvxS2e7iDrereVYc5SWPauXPyNwxcy9BXZrC1QTcHE",
 	"/ip4/94.130.135.167/udp/4001/quic/p2p/QmUEMvxS2e7iDrereVYc5SWPauXPyNwxcy9BXZrC1QTcHE",
 
-	// You can add more nodes here, for example, another IPFS node you might have running locally, mine was:
+	// You can add more nodes here, for example, another IPFS node you might have running locally
 	// "/ip4/127.0.0.1/tcp/4010/p2p/xxx",
 	// "/ip4/127.0.0.1/udp/4010/quic/p2p/yyy",
 }
 
-/// -------
-
+// flagExp repo flags to set
 var flagExp = flag.Bool("experimental", false, "enable experimental features")
