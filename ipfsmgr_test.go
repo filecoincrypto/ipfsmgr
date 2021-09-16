@@ -1,3 +1,8 @@
+// package ipfsmgr manager ipfs file, implemented uploading and downloading
+// files and directories,connecting peers.
+// Author : Andy Zhou <ablozhou@gmail.com>
+// Date   : 2021.9.15
+
 package ipfsmgr
 
 import (

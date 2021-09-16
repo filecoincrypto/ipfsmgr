@@ -1,6 +1,8 @@
-//package ipfsmgr manager ipfs file, implement upload and download files,connect peers.
-//Author : Andy Zhou <ablozhou@gmail.com>
-//Date   : 2021.9.15
+// package ipfsmgr manager ipfs file, implemented uploading and downloading
+// files and directories,connecting peers.
+// Author : Andy Zhou <ablozhou@gmail.com>
+// Date   : 2021.9.15
+
 package ipfsmgr
 
 import (
@@ -22,12 +24,12 @@ import (
 	"github.com/ipfs/go-ipfs/core"
 	"github.com/ipfs/go-ipfs/core/coreapi"
 	"github.com/ipfs/go-ipfs/core/node/libp2p"
-	"github.com/ipfs/go-ipfs/plugin/loader" // This package is needed so that all the preloaded plugins are loaded automatically
+	"github.com/ipfs/go-ipfs/plugin/loader"
 	"github.com/ipfs/go-ipfs/repo/fsrepo"
 	"github.com/libp2p/go-libp2p-core/peer"
 )
 
-//type IpfsMgr, create repo, collect to peers, add and get ipfs files.
+// type IpfsMgr, create repo, collect to peers, add and get ipfs files.
 type IpfsMgr struct {
 	ctx    context.Context
 	cancel context.CancelFunc

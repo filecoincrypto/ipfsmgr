@@ -16,11 +16,26 @@ The main functions of the library is:
 
 ## Getting started
 
+get ipfsmgr mod
+
+```
+go get -u github.com/filecoincrypto/ipfsmgr
+```
+
+then import the mod  as normal.
+```
+import (
+  m "github.com/filecoincrypto/ipfsmgr"
+)
+
+## build
 ```
 go clean --modcache
 go mod tidy
-go install
+
 go build -mod=mod
+
+go install
 ```
 
 ## install ipfs on Linux
