@@ -26,6 +26,8 @@ func TestMain(m *testing.M) {
 	}
 	fmt.Printf("output folder: %s\n", outputBasePath)
 	mgr = NewIpfsMgr("")
+	// init twice
+	mgr = NewIpfsMgr("")
 	m.Run()
 	log.Println("end test")
 }
@@ -38,6 +40,14 @@ func TestAddIpfsFile(t *testing.T) {
 		panic(fmt.Errorf("TestAddIpfsFile  %s failed! (%v)", file, err))
 	} else {
 		log.Println("upload ipfs cidFile:" + cidFile.String())
+	}
+
+	// test add twice
+	cidFile1, err := mgr.AddIpfsFile(file)
+	if err != nil {
+		panic(fmt.Errorf("TestAddIpfsFile 2 %s failed! (%v)", file, err))
+	} else {
+		log.Println("upload ipfs2 cidFile:" + cidFile1.String())
 	}
 }
 

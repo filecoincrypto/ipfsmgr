@@ -17,6 +17,7 @@ import (
 
 	config "github.com/ipfs/go-ipfs-config"
 	files "github.com/ipfs/go-ipfs-files"
+	logging "github.com/ipfs/go-log"
 	icore "github.com/ipfs/interface-go-ipfs-core"
 	icorepath "github.com/ipfs/interface-go-ipfs-core/path"
 	ma "github.com/multiformats/go-multiaddr"
@@ -27,25 +28,26 @@ import (
 	"github.com/ipfs/go-ipfs/plugin/loader"
 	"github.com/ipfs/go-ipfs/repo/fsrepo"
 	"github.com/libp2p/go-libp2p-core/peer"
+	loggables "github.com/libp2p/go-libp2p-loggables"
 )
 
 // type IpfsMgr, create repo, collect to peers, add and get ipfs files.
 type IpfsMgr struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	ipfs   icore.CoreAPI
+	ctx  context.Context
+	ipfs icore.CoreAPI
 }
+
+var plugins *loader.PluginLoader
 
 // NewIpfsMgr new instance of IpfsMgr
 // repoPath could be empty, default is ~/.ipfs
 func NewIpfsMgr(repoPath string) *IpfsMgr {
 	mgr := new(IpfsMgr)
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx := logging.ContextWithLoggable(context.Background(), loggables.Uuid("session")) // context.WithCancel(context.Background())
 	mgr.ctx = ctx
-	mgr.cancel = cancel
 	ipfs, err := mgr.CreateNode(repoPath)
 	if err != nil {
-		panic(fmt.Errorf("failed to spawn ephemeral node: %s", err))
+		panic(fmt.Errorf("failed to spawn node: %s", err))
 	}
 	mgr.ipfs = ipfs
 	return mgr
@@ -53,14 +55,14 @@ func NewIpfsMgr(repoPath string) *IpfsMgr {
 
 // AddIpfsFile add local file to IPFS
 func (mgr *IpfsMgr) AddIpfsFile(inputPathFile string) (cidFile icorepath.Path, err error) {
-
-	defer mgr.cancel()
+	ctx, cancel := context.WithCancel(mgr.ctx)
+	defer cancel()
 	file, err := mgr.GetLocalNode(inputPathFile)
 	if err != nil {
 		err = fmt.Errorf("could not get File: %s", err)
 		return nil, err
 	}
-	cidFile, err = mgr.ipfs.Unixfs().Add(mgr.ctx, file)
+	cidFile, err = mgr.ipfs.Unixfs().Add(ctx, file)
 	if err != nil {
 		err = fmt.Errorf("could not add File: %s", err)
 		return nil, err
@@ -70,13 +72,15 @@ func (mgr *IpfsMgr) AddIpfsFile(inputPathFile string) (cidFile icorepath.Path, e
 
 // AddIpfsDir add local directory to IPFS
 func (mgr *IpfsMgr) AddIpfsDir(inputPath string) (cidPath icorepath.Path, err error) {
+	ctx, cancel := context.WithCancel(mgr.ctx)
+	defer cancel()
 	directory, err := mgr.GetLocalNode(inputPath)
 	if err != nil {
 		err = fmt.Errorf("could not get File: %s", err)
 		return nil, err
 	}
 
-	cidDirectory, err := mgr.ipfs.Unixfs().Add(mgr.ctx, directory)
+	cidDirectory, err := mgr.ipfs.Unixfs().Add(ctx, directory)
 	if err != nil {
 		err = fmt.Errorf("could not add Directory: %s", err)
 		return nil, err
@@ -95,8 +99,9 @@ func (mgr *IpfsMgr) GetIpfsFile(cidPath string, outputPathFile string) (err erro
 
 // GetIpfsFile from cidFile from github.com/ipfs/interface-go-ipfs-core/path.Path
 func (mgr *IpfsMgr) GetIpfsFileFromCid(cidFile icorepath.Path, outputPathFile string) (err error) {
-
-	rootNodeFile, err := mgr.ipfs.Unixfs().Get(mgr.ctx, cidFile)
+	ctx, cancel := context.WithCancel(mgr.ctx)
+	defer cancel()
+	rootNodeFile, err := mgr.ipfs.Unixfs().Get(ctx, cidFile)
 	if err != nil {
 		err = fmt.Errorf("could not get file with CID: %s", err)
 		return
@@ -119,7 +124,9 @@ func (mgr *IpfsMgr) GetIpfsDir(cidPath string, outputPath string) (err error) {
 
 // GetIpfsDirFromCid from cidDirectory from github.com/ipfs/interface-go-ipfs-core/path.Path
 func (mgr *IpfsMgr) GetIpfsDirFromCid(cidDirectory icorepath.Path, outputPath string) (err error) {
-	rootNodeDirectory, err := mgr.ipfs.Unixfs().Get(mgr.ctx, cidDirectory)
+	ctx, cancel := context.WithCancel(mgr.ctx)
+	defer cancel()
+	rootNodeDirectory, err := mgr.ipfs.Unixfs().Get(ctx, cidDirectory)
 	if err != nil {
 		err = fmt.Errorf("could not get file with CID: %s", err)
 		return
@@ -166,7 +173,7 @@ func (mgr *IpfsMgr) CreateRepo(repoPath string) error {
 	// Create the repo with the config
 	err = fsrepo.Init(repoPath, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to init ephemeral node: %s", err)
+		return fmt.Errorf("failed to init node: %s", err)
 	}
 
 	return nil
@@ -180,23 +187,25 @@ func (mgr *IpfsMgr) CreateNode(repoPath string) (api icore.CoreAPI, err error) {
 		repoPath, err = config.PathRoot()
 		if err != nil {
 			// shouldn't be possible
-			return nil, err
+			return nil, fmt.Errorf("failed: config.PathRoot(): %s", err)
 		}
 
-	}
-	if err = mgr.CreateRepo(repoPath); err != nil {
-		return nil, err
+	} else {
+		if err = mgr.CreateRepo(repoPath); err != nil {
+			return nil, fmt.Errorf("failed: mgr.CreateRepo(%s): %s", repoPath, err)
+		}
 	}
 
-	if err = mgr.SetupPlugins(repoPath); err != nil {
-		return nil, err
+	if plugins, err = mgr.SetupPlugins(repoPath); err != nil {
+		return nil, fmt.Errorf("failed: mgr.SetupPlugins(%s): %s", repoPath, err)
 
 	}
 
 	// Open the repo
 	repo, err := fsrepo.Open(repoPath)
 	if err != nil {
-		return nil, err
+
+		return nil, fmt.Errorf("failed: fsrepo.Open(%s): %s", repoPath, err)
 	}
 
 	// Construct the node
@@ -209,7 +218,7 @@ func (mgr *IpfsMgr) CreateNode(repoPath string) (api icore.CoreAPI, err error) {
 
 	node, err := core.NewNode(mgr.ctx, nodeOptions)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed: core.NewNode(mgr.ctx, nodeOptions): %s", err)
 	}
 
 	// Attach the Core API to the constructed node
@@ -217,23 +226,40 @@ func (mgr *IpfsMgr) CreateNode(repoPath string) (api icore.CoreAPI, err error) {
 }
 
 // SetupPlugins setup repo external plugins directors and load the plugins
-func (mgr *IpfsMgr) SetupPlugins(pluginsPath string) error {
+func (mgr *IpfsMgr) SetupPlugins(pluginsPath string) (*loader.PluginLoader, error) {
 	// Load any external plugins if available on pluginsPath
+	if plugins != nil {
+		return plugins, nil
+	}
+
 	plugins, err := loader.NewPluginLoader(filepath.Join(pluginsPath, "plugins"))
 	if err != nil {
-		return fmt.Errorf("error loading plugins: %s", err)
+		return nil, fmt.Errorf("error loading plugins: %s", err)
 	}
 
 	// Load preloaded and external plugins
 	if err := plugins.Initialize(); err != nil {
-		return fmt.Errorf("error initializing plugins: %s", err)
+		return nil, fmt.Errorf("error initializing plugins: %s", err)
 	}
 
 	if err := plugins.Inject(); err != nil {
-		return fmt.Errorf("error initializing plugins: %s", err)
+		return nil, fmt.Errorf("error inject plugins: %s", err)
 	}
 
-	return nil
+	return plugins, nil
+}
+
+func (mgr *IpfsMgr) GetRepoPath() (string, error) {
+
+	repoPath, err := fsrepo.BestKnownPath()
+	if err != nil {
+		return "", err
+	}
+	return repoPath, nil
+}
+
+func (mgr *IpfsMgr) LoadConfig(path string) (*config.Config, error) {
+	return fsrepo.ConfigAt(path)
 }
 
 // ConnectToPeers connect peers, there are default bootstrap peers.
