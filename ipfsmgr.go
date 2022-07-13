@@ -15,8 +15,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	config "github.com/ipfs/go-ipfs-config"
 	files "github.com/ipfs/go-ipfs-files"
+	"github.com/ipfs/go-ipfs/config"
 	logging "github.com/ipfs/go-log"
 	icore "github.com/ipfs/interface-go-ipfs-core"
 	icorepath "github.com/ipfs/interface-go-ipfs-core/path"
@@ -256,10 +256,6 @@ func (mgr *IpfsMgr) GetRepoPath() (string, error) {
 		return "", err
 	}
 	return repoPath, nil
-}
-
-func (mgr *IpfsMgr) LoadConfig(path string) (*config.Config, error) {
-	return fsrepo.ConfigAt(path)
 }
 
 // ConnectToPeers connect peers, there are default bootstrap peers.

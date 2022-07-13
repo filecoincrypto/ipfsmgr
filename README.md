@@ -1,6 +1,6 @@
 # IPFS Manager 
 - Author: Andy Zhou <ablozhou@gmail.com>
-- Date: 2021-09-15
+- Date: 2022-07-15
 
 ## Abstract
 This is a golang module to manager IPFS file and directory.
@@ -51,8 +51,8 @@ go install
 
 ## Install ipfs on Linux
 ```
-wget https://dist.ipfs.io/go-ipfs/v0.9.1/go-ipfs_v0.9.1_linux-amd64.tar.gz --no-check-certificate
-tar -xvzf go-ipfs_v0.9.1_linux-amd64.tar.gz
+wget https://dist.ipfs.io/go-ipfs/v0.13.1/go-ipfs_v0.13.1_linux-amd64.tar.gz --no-check-certificate
+tar -xvzf go-ipfs_v0.13.1_linux-amd64.tar.gz
 
 > x go-ipfs/install.sh
 > x go-ipfs/ipfs
@@ -63,7 +63,7 @@ sudo bash install.sh
 > Moved ./ipfs to /usr/local/bin
 ipfs --version
 
-> ipfs version 0.9.1
+> ipfs version 0.13.1
 ```
 
 ## Running a test
@@ -77,12 +77,7 @@ To run the test, just do:
 # Trouble shooting
 - missing go.sum entry for module providing package ...  
   run `go build -mod=mod` will generate go.sum
-- go-multiaddr-net@v0.2.0/registry.go:25:17: undefined: manet.NetCodec  
-  go-multiaddr v0.3.3 and not v0.4.0.
-- libp2p/go-libp2p-noise@v0.2.0/handshake.go:209:21: cannot assign error to err in multiple assignment  
-  go-libp2p-core v0.8.6 and not v0.9.0
-- go-ipfs@v0.9.1/core/coreapi/path.go:52:18: undefined: resolver.ResolveOnce   
-  replace go-ipfs v0.9.1 to latest v0.10.0-rc1
+
 - panic: failed to spawn ephemeral node: no IPFS repo found in /home/zhh/.ipfs.  
   please install go-ipfs and run: 'ipfs init'. 
 - failed to spawn ephemeral node: failed to init ephemeral node: unknown datastore type: flatfs  
